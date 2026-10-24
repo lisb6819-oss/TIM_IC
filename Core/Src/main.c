@@ -110,7 +110,7 @@ int main(void)
         printf("高电平: %d ms \r\n", temp/1000); // Print the captured value
         cap_sta=0; // Reset capture status
     }
-    HAL_Delay(100); // Delay for 100 ms
+    HAL_Delay(20); // Delay for 20 ms
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
