@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +56,19 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+  int upedge = 0;
+  int downedge = 0;
+  float distance = 0;
+  void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+  {
+    if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+    {
+      upedge = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+      downedge = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+      distance = (downedge - upedge) * 0.034 / 2;
 
+    }
+  }
 /* USER CODE END 0 */
 
 /**
@@ -91,13 +103,23 @@ int main(void)
   MX_TIM1_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start(&htim1);
+  HAL_TIM_IC_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    HAL_GPIO_WritePin(Trig_GPIO_Port, Trig_Pin , GPIO_PIN_SET);
+    HAL_Delay(1);
+    HAL_GPIO_WritePin(Trig_GPIO_Port, Trig_Pin , GPIO_PIN_RESET);
+    __HAL_TIM_SET_COUNTER(&htim1,0);
+    HAL_Delay(20);
+     printf("Distance: %.2f cm\r\n", distance);
+    HAL_Delay(500);
+    
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
