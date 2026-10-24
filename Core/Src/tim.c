@@ -179,7 +179,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
           {
               if(cap_sta&0x100) // If bit 0 is set, indicating channel 1 capture occurred
               {
-                if((cap_val & 0xff)==0xff) // If captured value is less than 1000
+                if((cap_sta & 0xff)==0xff) // If captured value is less than 1000
                 {
                   cap_sta|=0x200; 
                   cap_val=0xffff; // Set captured value to 0xffff to indicate overflow
