@@ -146,6 +146,51 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
+  uint16_t cap_sta=0;
+  uint16_t cap_val=0;
 
+  void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+  {
+      if(htim->Instance==TIM1)
+      {
+          if(htim->Channel==HAL_TIM_ACTIVE_CHANNEL_1) // Channel 1 capture event
+          {
+            cap_val=0;
+            cap_sta=0;
+            cap_sta|=0x100;
+            __HAL_TIM_DISABLE(htim); 
+            __HAL_TIM_SET_COUNTER(htim, 0); // Reset the counter to 0
+            __HAL_TIM_ENABLE(htim); 
+
+          }
+          else if(htim->Channel==HAL_TIM_ACTIVE_CHANNEL_2) // Channel 2 capture event
+          {
+              cap_val=HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2); // Read captured value
+              cap_sta|=0x200; // Set bit 1 to indicate capture on channel 2
+          }
+      }
+  }
+
+  void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+  {
+      if(htim->Instance==TIM1)
+      {
+          if((cap_sta & 0x200)==0) // If bit 1 is set, indicating channel 2 capture occurred
+          {
+              if(cap_sta&0x100) // If bit 0 is set, indicating channel 1 capture occurred
+              {
+                if((cap_val & 0xff)==0xff) // If captured value is less than 1000
+                {
+                  cap_sta|=0x200; 
+                  cap_val=0xffff; // Set captured value to 0xffff to indicate overflow
+                }
+                else
+                {
+                  cap_sta++;
+                }
+              }
+          }
+      }
+  }
 /* USER CODE END 1 */
 

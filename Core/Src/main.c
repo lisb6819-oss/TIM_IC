@@ -45,7 +45,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+extern uint16_t cap_sta;
+extern uint16_t cap_val;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,6 +68,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+  uint32_t temp = 0;
 
   /* USER CODE END 1 */
 
@@ -83,9 +85,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  HAL_TIM_Base_Start_IT(&htim1); // Start TIM1 with interrupt
-  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1); // Start TIM1 input capture on channel 1 with interrupt
-  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2); // Start TIM1 input capture on channel 2 with interrupt
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -93,13 +93,24 @@ int main(void)
   MX_TIM1_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start_IT(&htim1); // Start TIM1 with interrupt
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1); // Start TIM1 input capture on channel 1 with interrupt
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2); // Start TIM1 input capture on channel 2 with interrupt
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    if(cap_sta&0x200) // Check if capture on channel 2 has occurred
+    {
+        temp=cap_sta&0xff; // Clear the capture flag for channel 2
+        temp*=65536; // Store the captured value
+        temp+=cap_val; // Add the captured value from channel 2
+        printf("高电平: %d ms \r\n", temp/1000); // Print the captured value
+        cap_sta=0; // Reset capture status
+    }
+    HAL_Delay(100); // Delay for 100 ms
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
