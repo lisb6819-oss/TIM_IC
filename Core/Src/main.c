@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -83,7 +83,9 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  HAL_TIM_Base_Start_IT(&htim1); // Start TIM1 with interrupt
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1); // Start TIM1 input capture on channel 1 with interrupt
+  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_2); // Start TIM1 input capture on channel 2 with interrupt
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
